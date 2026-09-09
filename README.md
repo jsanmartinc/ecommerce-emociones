@@ -33,49 +33,65 @@ El sistema cuenta con un único modelo que representa el catálogo de productos 
 |         /admin/          |    GET   |  Panel de administración |    Administradores    |
 
 
-## Usuarios de prueba
-**admin / admin123 (Superusuario)**
+
 
 
 ## Pasos para ejecutar el proyecto
 
-# 1. Activar entorno virtual
-env\Scripts\activate  # Windows
-source env/bin/activate  # Linux/macOS
+### 1. Activar entorno virtual
+```bash
+# Windows
+env\Scripts\activate
+# Linux/macOS
+source env/bin/activate
+```
 
-# 2. Instalar dependencias
-pip install django psycopg2-binary
+### 2. Instalar dependencias
+```bash
+pip install -r requirements.txt
+```
 
-# 3. Configurar PostgreSQL (crear base de datos 'portafolio_m7')
-El proyecto necesita carga de DB para su funcionamiento, se adjunta información de prueba en la parte inferior del presente archivo
+### 3. Configurar variables de entorno
+Crea un archivo .env en la raíz del proyecto usando .env.example como plantilla y configura tus credenciales locales de PostgreSQL:
+```Ini, TOML
+SECRET_KEY=tu_clave_secreta_local
+DEBUG=True
+DB_NAME=portafolio_m7
+DB_USER=postgres
+DB_PASSWORD=tu_password_postgres
+DB_HOST=localhost
+DB_PORT=5432
+```
 
-# 4. Aplicar migraciones
-python manage.py makemigrations
-python manage.py migrate
-
-# 5. Crear superusuario
-python manage.py createsuperuser
-
-# 6. Ejecutar servidor
-python manage.py runserver
-
-
-----------------------------------------------------------------------
-----------------------------------------------------------------------
-
-## Configuración DB
-
+### 4. Configurar PostgreSQL (crear base de datos 'portafolio_m7')
+Ejecuta la siguiente consulta SQL en tu cliente de base de datos:
+```sql
 CREATE DATABASE portafolio_m7
     ENCODING 'UTF8'
     LC_COLLATE 'C'
     LC_CTYPE 'C'
     TEMPLATE template0;
+```
 
-## DATOS DE PRUEBA
-Cargar por medio del comando 
-**python manage.py shell**
+### 5. Aplicar migraciones
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
 
+### 6. Crear superusuario
+```bash
+python manage.py createsuperuser
+```
 
+### 7. Cargar datos de prueba (OPCIONAL)
+# Ejecuta consola
+```bash
+python manage.py shell
+```
+
+# E ingresa el siguiente script:
+```python
 from products.models import Producto
 
 productos = [
@@ -90,3 +106,14 @@ productos = [
 Producto.objects.bulk_create(productos)
 print(f"Productos creados: {Producto.objects.count()}")
 exit()
+```
+
+
+
+### 8. Ejecutar servidor
+```bash
+python manage.py runserver
+```
+
+----------------------------------------------------------------------
+----------------------------------------------------------------------
