@@ -1,0 +1,301 @@
+{% extends "base.html" %} {% load static %} {% block title %}E-moshop - Tienda
+de Emociones{% endblock %} {% block extra_css %}
+
+<style>
+  .card {
+    margin-bottom: 20px;
+    transition: transform 0.2s;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px #ff00aa;
+  }
+
+  .product-img {
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #2a2a2a;
+    border-radius: 10px;
+    margin: 15px;
+    overflow: hidden;
+  }
+  .product-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  h1,
+  h2 {
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 20px;
+  }
+  .saludo {
+    text-align: center;
+    margin: 30px 0;
+  }
+  footer {
+    background-color: #f8057671;
+    color: white;
+    text-align: center;
+    padding: 3px;
+    margin-top: 100px;
+  }
+  h1 {
+    font-family: "Arial Black", "Impact", sans-serif;
+    letter-spacing: 2px;
+    font-weight: 900;
+  }
+  @media (max-width: 420px) {
+    h1 {
+      font-size: 1.5rem;
+    }
+    .product-img {
+      height: 150px;
+    }
+  }
+</style>
+{% endblock %} {% block content %}
+
+<!-- Saludo -->
+<div class="saludo">
+  <h1 style="font-size: 50px">¡Bienvenido a nuestra tienda de emociones!</h1>
+  <p class="lead">Explora nuestros productos y encuentra lo que necesitas.</p>
+</div>
+
+<!-- Carrusel -->
+<header>
+  <div id="miCarrusel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <img
+          src="{% static 'assets/Logotipo.png' %}"
+          class="d-block w-100"
+          alt="Felicidad"
+          style="height: 400px; object-fit: cover"
+        />
+      </div>
+      <div class="carousel-item">
+        <img
+          src="{% static 'assets/Felicidad.png' %}"
+          class="d-block w-100"
+          alt="Tristeza"
+          style="height: 400px; object-fit: cover"
+        />
+      </div>
+      <div class="carousel-item">
+        <img
+          src="{% static 'assets/Tristeza.png' %}"
+          class="d-block w-100"
+          alt="Furia"
+          style="height: 400px; object-fit: cover"
+        />
+      </div>
+      <div class="carousel-item">
+        <img
+          src="{% static 'assets/Furia.png' %}"
+          class="d-block w-100"
+          alt="Logotipo"
+          style="height: 400px; object-fit: cover"
+        />
+      </div>
+    </div>
+    <button
+      class="carousel-control-prev"
+      type="button"
+      data-bs-target="#miCarrusel"
+      data-bs-slide="prev"
+    >
+      <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button
+      class="carousel-control-next"
+      type="button"
+      data-bs-target="#miCarrusel"
+      data-bs-slide="next"
+    >
+      <span class="carousel-control-next-icon"></span>
+    </button>
+  </div>
+</header>
+
+<!-- Productos -->
+<h2 class="text-center mb-4">Compra tus Emociones Favoritas</h2>
+
+<section class="container mt-4">
+  <div class="row">
+    {% for producto in productos %}
+    <!-- Producto -->
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 d-flex flex-column">
+        <div class="product-img">
+          {% if producto.imagen %}
+          <img src="{% static producto.imagen %}" alt="{{ producto.nombre }}" />
+          {% else %}
+          <img src="{% static 'assets/placeholder.png' %}" alt="Sin imagen" />
+          {% endif %}
+        </div>
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">{{ producto.nombre }}</h5>
+          <p class="card-text">{{ producto.descripcion|truncatechars:80 }}</p>
+          <p class="fw-bold text-primary">
+            ${{ producto.precio|floatformat:"0" }}
+          </p>
+
+          <!-- Botones uno al lado del otro -->
+          <div class="d-flex gap-2 mt-auto">
+            <!-- Botón de ver más -->
+            <button
+              class="btn btn-primary verMas flex-grow-1"
+              data-nombre="{{ producto.nombre }}"
+              data-precio="{{ producto.precio }}"
+              data-descripcion="{{ producto.descripcion }}"
+              data-beneficios="{{ producto.beneficios|default:'😊 Beneficio 1|🎁 Beneficio 2|✨ Beneficio 3' }}"
+              data-imagen="{% static producto.imagen %}"
+            >
+              Ver Más...
+            </button>
+            {% if user.is_authenticated %}
+            <!-- Botón de edición -->
+            <a href="{% url 'products_edit' producto.id %}" class="btn btn-warning flex-grow-1">
+                    Editar
+            </a>
+            <!-- Botón de eliminación -->
+            <a href="{% url 'products_delete' producto.id %}" class="btn btn-danger flex-grow-1">
+                    Eliminar
+            </a>
+            {% endif %}
+            
+            <!-- Botón de agregado al carrito -->
+            <button
+              class="btn btn-outline-primary agregarCarritoBtn flex-grow-1"
+              data-producto="{{ producto.nombre }}"
+              data-precio="{{ producto.precio }}"
+            >
+              Agregar 🛒
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+      <div class="alert alert-warning text-center">
+        No hay productos disponibles.
+        <a href="{% url 'product_create' %}" class="alert-link"
+          >Agrega el primero</a
+        >
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Paginación -->
+<section class="container my-4">
+  <nav aria-label="...">
+    <ul class="pagination justify-content-center">
+      <li class="page-item disabled"><a class="page-link">Anterior</a></li>
+      <li class="page-item active"><a class="page-link" href="#">1</a></li>
+      <li class="page-item"><a class="page-link" href="#">2</a></li>
+      <li class="page-item"><a class="page-link" href="#">3</a></li>
+      <li class="page-item"><a class="page-link" href="#">Siguiente</a></li>
+    </ul>
+  </nav>
+</section>
+{% endblock %} {% block extra_js %}
+<script>
+  let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+
+  function actualizarContador() {
+    const total = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+    const contadorSpan = document.getElementById("carritoContador");
+    if (contadorSpan) contadorSpan.innerText = total;
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+  }
+
+  function agregarAlCarrito(productoNombre, productoPrecio) {
+    const existente = carrito.find((item) => item.nombre === productoNombre);
+    if (existente) {
+      existente.cantidad++;
+    } else {
+      carrito.push({
+        nombre: productoNombre,
+        precio: productoPrecio,
+        cantidad: 1,
+      });
+    }
+    actualizarContador();
+
+    // Mostrar modal de éxito
+    const mensajeSpan = document.getElementById("mensajeProductoAgregado");
+    if (mensajeSpan) {
+      mensajeSpan.innerHTML = `✨ ${productoNombre} ✨<br>ha sido agregada al carrito`;
+    }
+    new bootstrap.Modal(document.getElementById("exitoCarritoModal")).show();
+  }
+
+  // Botones "Ver Más..." - Muestran el detalle
+  document.querySelectorAll(".verMas").forEach((boton) => {
+    boton.addEventListener("click", function () {
+      const nombre = this.getAttribute("data-nombre");
+      const precio = this.getAttribute("data-precio");
+      const descripcion = this.getAttribute("data-descripcion");
+      const beneficios = this.getAttribute("data-beneficios").split("|");
+      const imagen = this.getAttribute("data-imagen");
+
+      // Llenar el modal de detalle
+      document.getElementById("detalleTitulo").innerHTML = `📖 ${nombre}`;
+      document.getElementById("detalleNombre").innerHTML = nombre;
+      document.getElementById("detalleDescripcion").innerHTML = descripcion;
+      document.getElementById("detallePrecio").innerHTML =
+        `$${parseInt(precio).toLocaleString()}`;
+      document.getElementById("detalleImagen").src = imagen;
+
+      // Llenar lista de beneficios
+      const listaBeneficios = document.getElementById("detalleBeneficios");
+      listaBeneficios.innerHTML = beneficios
+        .map((b) => `<li>${b}</li>`)
+        .join("");
+
+      // Guardar datos para el botón "Agregar" dentro del modal
+      const btnAgregar = document.getElementById("btnAgregarDesdeDetalle");
+      btnAgregar.setAttribute("data-producto", nombre);
+      btnAgregar.setAttribute("data-precio", precio);
+
+      // Mostrar modal
+      new bootstrap.Modal(
+        document.getElementById("detalleProductoModal"),
+      ).show();
+    });
+  });
+
+  // Botón "Agregar" dentro del modal de detalle
+  document
+    .getElementById("btnAgregarDesdeDetalle")
+    .addEventListener("click", function () {
+      const producto = this.getAttribute("data-producto");
+      const precio = parseInt(this.getAttribute("data-precio"));
+      agregarAlCarrito(producto, precio);
+
+      // Cerrar modal de detalle
+      bootstrap.Modal.getInstance(
+        document.getElementById("detalleProductoModal"),
+      ).hide();
+    });
+
+  // Botones "Agregar X 🛒" de las tarjetas
+  document.querySelectorAll(".agregarCarritoBtn").forEach((boton) => {
+    boton.addEventListener("click", function () {
+      const producto = this.getAttribute("data-producto");
+      const precio = parseInt(this.getAttribute("data-precio"));
+      agregarAlCarrito(producto, precio);
+    });
+  });
+
+  actualizarContador();
+</script>
+{% endblock %}
